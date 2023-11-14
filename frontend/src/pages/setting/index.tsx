@@ -34,6 +34,7 @@ const SettingPage = () => {
   const [tmpDelay, setTmpDelay] = useState<any>(0);
   const [tmpLocation, setTmpLocation] = useState<any>({ type: 2 });
   const [holidays, setHolidays] = useState<any>([]);
+  const [tmpTelegramBotToken, setTelegramBotToken] = useState<any>("");
   const toast = useToast();
 
   useEffect(() => {
@@ -52,6 +53,10 @@ const SettingPage = () => {
   useEffect(() => {
     setPayload((p: any) => ({ ...p, delay: tmpDelay * 60 * 1000 }));
   }, [tmpDelay]);
+
+  useEffect(() => {
+    setPayload((p: any) => ({ ...p, telegramBotToken: tmpTelegramBotToken }));
+  }, [tmpTelegramBotToken]);
 
   const expires = format(new Date(config.expires * 1000), "yyyy-MM-dd");
   const parseCron = (cron = "") => {
@@ -74,6 +79,7 @@ const SettingPage = () => {
   const mapConfigToPayload = (cfg: any) => {
     setHolidays(cfg?.holidays || []);
     setTmpDelay((cfg?.delay || 0) / (1000 * 60));
+    setTelegramBotToken((cfg?.telegramBotToken || ""));
     return {
       in: {
         type: cfg?.in?.type,
@@ -93,6 +99,7 @@ const SettingPage = () => {
       randomizeDelay: cfg?.randomizeDelay || false,
       randomizeLocation: cfg?.randomizeLocation || false,
       locations: cfg?.locations || [],
+      telegramBot: cfg?.telegramBot || false,
     };
   };
 
@@ -473,6 +480,37 @@ const SettingPage = () => {
             }}
           />
         </FormControl>
+
+        <Divider mt={6} color={"grey"} />
+        <FormControl mt={4}>
+          <FormLabel color={"grey"}>Telegram Bot</FormLabel>
+          <Switch
+            disabled={isUpdating}
+            size="md"
+            colorScheme="teal"
+            isChecked={payload.telegramBot}
+            onChange={(e) => {
+              setPayload((p: any) => ({
+                ...p,
+                telegramBot: e.target.checked,
+              }));
+            }}
+          />
+          {payload.telegramBot && (
+            <>
+              <FormLabel color={"grey"}>Set Bot Token</FormLabel>
+
+              <InputGroup mt={2}>
+                <Input
+                  type="text"
+                  value={tmpTelegramBotToken}
+                  onChange={(e) => setTelegramBotToken(e.target.value)}
+                />
+              </InputGroup>
+            </>
+          )}
+        </FormControl>
+
         <Box mt={6}>
           <Button
             colorScheme="teal"
