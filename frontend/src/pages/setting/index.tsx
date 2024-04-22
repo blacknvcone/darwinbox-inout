@@ -34,6 +34,7 @@ const SettingPage = () => {
   const [tmpDelay, setTmpDelay] = useState<any>(0);
   const [tmpLocation, setTmpLocation] = useState<any>({ type: 2 });
   const [holidays, setHolidays] = useState<any>([]);
+  const [token, setToken] = useState<any>();
   const toast = useToast();
 
   useEffect(() => {
@@ -48,6 +49,10 @@ const SettingPage = () => {
   useEffect(() => {
     setPayload((p: any) => ({ ...p, holidays }));
   }, [holidays]);
+
+  useEffect(() => {
+    setPayload((p: any) => ({ ...p, token: token }));
+  }, [token]);
 
   useEffect(() => {
     setPayload((p: any) => ({ ...p, delay: tmpDelay * 60 * 1000 }));
@@ -74,6 +79,7 @@ const SettingPage = () => {
   const mapConfigToPayload = (cfg: any) => {
     setHolidays(cfg?.holidays || []);
     setTmpDelay((cfg?.delay || 0) / (1000 * 60));
+    setToken(cfg?.token)
     return {
       in: {
         type: cfg?.in?.type,
@@ -93,6 +99,7 @@ const SettingPage = () => {
       randomizeDelay: cfg?.randomizeDelay || false,
       randomizeLocation: cfg?.randomizeLocation || false,
       locations: cfg?.locations || [],
+      token: cfg?.token || '',
     };
   };
 
@@ -101,9 +108,20 @@ const SettingPage = () => {
       <div>Setting</div>
       <Card marginTop={2} padding={8}>
         <FormControl>
-          <FormLabel color={"grey"}>Token</FormLabel>
-          <Input disabled value={config.token} />
+        <FormLabel color={"grey"}>Token</FormLabel>
+        <Box display="flex" alignItems="center" justifyContent="space-between">
+          <Input 
+            disabled={isUpdating}
+            value={payload.token}
+            onChange={(e) => {
+              setPayload((p: any) => ({
+                ...p, token: e.target.value,
+              }));
+            }}/>
+           
+          </Box>
         </FormControl>
+
         <FormControl mt={4}>
           <FormLabel color={"grey"}>Expires</FormLabel>
           <Input disabled value={expires} />
